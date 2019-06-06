@@ -1,0 +1,72 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+}
+
+<script>
+
+	// ToDo: dynamic persistent array for left and right select options - local storage
+
+	function moveSelectedOption(id1, id2) {
+		var sel = document.getElementById(id1);
+		var selVal = sel.value;
+		if (selVal != null) {
+			// remove from left
+			for (var i = 0; i < sel.length; i++) {
+				if (sel.options[i].value == selVal)
+					sel.remove(i);
+			}
+			// add to right
+			var sel2 = document.getElementById(id2);
+			sel2.options[sel2.options.length] = new Option(selVal, selVal, false, false);
+
+		}
+	}
+	function submit() {
+		var sel2 = document.getElementById('rightSelect');
+		$.ajax({
+			type: 'GET',
+			data: {}, // ToDo: pass list of option values
+			url: '/Default/Submitted/',			
+			success: function (data) {
+				document.getElementById('result').value = data;
+			}
+		});
+	}
+</script>
+<br />
+<table>
+	<tr>
+		<td>
+			<select multiple id="leftSelect" style="width:100px;height:150px;">
+				<!-- ToDo: dynamic loading -->
+				<option value="a">a</option>
+				<option value="b">b</option>
+				<option value="c">c</option>
+				<option value="d">d</option>
+				<option value="e">e</option>
+
+			</select>
+
+		</td>
+		<td style="padding: 10px;">
+			<button onclick="moveSelectedOption('leftSelect', 'rightSelect')"> >> </button>
+			<br />
+			<button onclick="moveSelectedOption('rightSelect', 'leftSelect')"> << </button>
+		</td>
+		<td>
+			<select multiple id="rightSelect" style="width:100px;height:150px;"></select>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="text-align:center;padding:15px;">
+			<button onclick="submit()"> Submit </button>
+		</td>
+	</tr>
+	<tr>
+		<td colspan="3" style="text-align:center;padding:15px;">
+			<input type="text" id="result"/>
+		</td>
+	</tr>
+
+
+</table>
