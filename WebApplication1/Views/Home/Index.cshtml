@@ -24,10 +24,13 @@
 		
 	}
 	function populateSelect(options, selectId) {
-		for (var key in options) {
-			if (options[key] != '' && options[key] != null) {
-				$('#'+selectId).append('<option value="' + options[key] + '">' + options[key] + '</option>');
-			}			
+		var select = document.getElementById(selectId);
+		for (var key in options) {			
+			select.options[select.options.length] = new Option(options[key], options[key]);
+			// jquery append here seems to cause a glitch on MS Edge where the first click on an option after page load does not work
+			//if (options[key] != '' && options[key] != null) {
+			//	$('#' + selectId).append('<option value="' + options[key] + '">' + options[key] + '</option>');
+			//}			
 		}
 	}
 	function moveSelectedOption(selectBoxId1, selectBoxId2) {
