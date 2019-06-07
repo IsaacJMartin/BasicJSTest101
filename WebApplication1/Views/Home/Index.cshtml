@@ -4,32 +4,65 @@
 
 <script>
 
-	// ToDo: dynamic persistent array for left and right select options - local storage
+	// default select options
+	leftSelectOptions = ["a", "b", "c", "d", "e"];
+	rightSelectOptions = [];
 
-	function moveSelectedOption(id1, id2) {
-		var sel = document.getElementById(id1);
-		var selVal = sel.value;
-		if (selVal != null) {
-			// remove from left
-			for (var i = 0; i < sel.length; i++) {
-				if (sel.options[i].value == selVal)
-					sel.remove(i);
+	// on load populate the select boxes
+	onload = function ()
+	{
+		// load left select
+		if (localStorage.getItem("leftSelectOptions") !== null) {
+			leftSelectOptions = JSON.parse(localStorage.getItem("leftSelectOptions"));
+		}
+		populateSelect(leftSelectOptions, "leftSelect");
+		// load right select
+		if (localStorage.getItem("rightSelectOptions") !== null) {
+			rightSelectOptions = JSON.parse(localStorage.getItem("rightSelectOptions"));
+		}
+		populateSelect(rightSelectOptions, "rightSelect");
+		
+	}
+	function populateSelect(options, selectId) {
+		for (var key in options) {
+			if (options[key] != '' && options[key] != null) {
+				$('#'+selectId).append('<option value="' + options[key] + '">' + options[key] + '</option>');
+			}			
+		}
+	}
+	function moveSelectedOption(selectBoxId1, selectBoxId2) {
+		var selBox1 = document.getElementById(selectBoxId1);
+		var selBox1Val = selBox1.value;
+		if (selBox1Val != '' && selBox1Val != null) {
+			// remove select box 1
+			for (var i = 0; i < selBox1.length; i++) {
+				if (selBox1.options[i].value == selBox1Val)
+					selBox1.remove(i);
 			}
-			// add to right
-			var sel2 = document.getElementById(id2);
-			sel2.options[sel2.options.length] = new Option(selVal, selVal, false, false);
+			// add to select box 2
+			var selBox2 = document.getElementById(selectBoxId2);
+			selBox2.options[selBox2.options.length] = new Option(selBox1Val, selBox1Val, false, false);
 
+			// store the latest leftSelect options
+			leftSelectOptions = [];
+			$('#leftSelect option').each(function() {
+				leftSelectOptions.push($(this).val())
+			});
+			localStorage.setItem("leftSelectOptions", JSON.stringify(leftSelectOptions));
+			
+			// store the latest rightSelect options
+			rightSelectOptions = [];
+			$('#rightSelect option').each(function() {
+				rightSelectOptions.push($(this).val())
+			});
+			localStorage.setItem("rightSelectOptions", JSON.stringify(rightSelectOptions));
 		}
 	}
 	function submit() {
-		var sel2 = document.getElementById('rightSelect');
-		$.ajax({
-			type: 'GET',
-			data: {}, // ToDo: pass list of option values
-			url: '/Default/Submitted/',			
-			success: function (data) {
-				document.getElementById('result').value = data;
-			}
+		jQuery.ajaxSettings.traditional = true;
+		$.get( "/Default/Submitted/", { "options": rightSelectOptions } )
+		.done(function( data ) {
+			$('#result').val(data);
 		});
 	}
 </script>
@@ -37,21 +70,13 @@
 <table>
 	<tr>
 		<td>
-			<select multiple id="leftSelect" style="width:100px;height:150px;">
-				<!-- ToDo: dynamic loading -->
-				<option value="a">a</option>
-				<option value="b">b</option>
-				<option value="c">c</option>
-				<option value="d">d</option>
-				<option value="e">e</option>
-
-			</select>
+			<select multiple id="leftSelect" style="width:100px;height:150px;"></select>
 
 		</td>
 		<td style="padding: 10px;">
-			<button onclick="moveSelectedOption('leftSelect', 'rightSelect')"> >> </button>
+			<button onclick="moveSelectedOption('leftSelect', 'rightSelect')"> &gt;&gt; </button>
 			<br />
-			<button onclick="moveSelectedOption('rightSelect', 'leftSelect')"> << </button>
+			<button onclick="moveSelectedOption('rightSelect', 'leftSelect')"> &lt;&lt; </button>
 		</td>
 		<td>
 			<select multiple id="rightSelect" style="width:100px;height:150px;"></select>

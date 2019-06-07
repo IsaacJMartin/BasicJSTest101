@@ -11,16 +11,15 @@ namespace WebApplication1.Controllers
 
         public IActionResult Index()
         {
-
 			return View();
         }
 
 		// 
 		// GET: /Default/Submitted/
-		public string Submitted()
+		public string Submitted(List<string> options)
 		{
-			// ToDo: Get submitted options, sort and return as JSON
-			return "Submitted...";
+			options.Sort();
+			return string.Join(",", options);
 		}
 
 	}
